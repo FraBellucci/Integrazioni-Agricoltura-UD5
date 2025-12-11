@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sostanze Pericolose - UD5</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 800px;
+            height: 550px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.9em;
+        }
+
+        .content {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .intro-screen, .transition-screen {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .intro-screen h2, .transition-screen h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .intro-screen p, .transition-screen p {
+            font-size: 0.95em;
+            line-height: 1.5;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .instructions {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin: 15px auto;
+            border-radius: 8px;
+            max-width: 700px;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .instructions ul {
+            list-style-position: inside;
+            line-height: 1.6;
+            font-size: 0.9em;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-size: 1em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 8px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 10px 0;
+        }
+
+        .card {
+            background: white;
+            border: 3px solid #dee2e6;
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card.selected {
+            border-color: #667eea;
+            background: #e7f3ff;
+            border-width: 4px;
+        }
+
+        .card.matched {
+            border-color: #28a745;
+            background: #d4edda;
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .card.wrong {
+            border-color: #dc3545;
+            background: #f8d7da;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-icon img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+        }
+
+        .card-text {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .phase-title {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .phase-title h3 {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .results-screen {
+            text-align: center;
+            padding: 15px 10px;
+        }
+
+        .results-screen h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .result-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .feedback.success { border-left: 5px solid #28a745; }
+        .feedback.error { border-left: 5px solid #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Sostanze Pericolose</h1>
+            <p>Riconoscimento Pittogrammi e DPI - UD5</p>
+        </div>
+
+        <div class="content" id="content">
+            <!-- Content will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        const game = {
+            phase: 'intro',
+            score: 0,
+            matches: 0,
+            attempts: 0,
+            selectedCards: [],
+            matchedPairs: [],
+            phase1Score: 0,
+            phase2Score: 0
+        };
+
+        const pittogrammi = {
+            'esplosivo': { icon: './images/esplosivo.png', name: 'Esplosivo', desc: 'Nitrati, dinamite' },
+            'infiammabile': { icon: './images/infiammabile.png', name: 'Infiammabile', desc: 'Benzina, solventi' },
+            'comburente': { icon: './images/comburente.png', name: 'Comburente', desc: 'Ossigeno, perossidi' },
+            'gas-pressione': { icon: './images/gas-pressione.png', name: 'Gas sotto pressione', desc: 'Bombole gas' },
+            'corrosivo': { icon: './images/corrosivo.png', name: 'Corrosivo', desc: 'Acidi, basi forti' },
+            'tossico': { icon: './images/tossico.png', name: 'Tossico', desc: 'Pesticidi, cianuri' },
+            'irritante': { icon: './images/irritante.png', name: 'Irritante', desc: 'Ammoniaca, soda' },
+            'pericoloso': { icon: './images/pericoloso-ambiente.png', name: 'Pericoloso ambiente', desc: 'Fitofarmaci' }
+        };
+
+        const guanti = {
+            'nitrile': { icon: './images/guanti-nitrile.png', name: 'Guanti Nitrile', use: 'Oli, solventi' },
+            'neoprene': { icon: './images/guanti-neoprene.png', name: 'Guanti Neoprene', use: 'Acidi, basi' },
+            'pvc': { icon: './images/guanti-pvc.png', name: 'Guanti PVC', use: 'Acidi forti' },
+            'butile': { icon: './images/guanti-butile.png', name: 'Guanti Butile', use: 'Gas, vapori' }
+        };
+
+        function init() {
+            renderIntro();
+        }
+
+        function renderIntro() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="intro-screen">
+                    <h2>🎯 Gestione Sostanze Pericolose</h2>
+                    <p>Impara a riconoscere i pittogrammi CLP e scegliere i DPI corretti per le sostanze chimiche.</p>
+
+                    <div class="instructions">
+                        <h3>📋 Come Giocare</h3>
+                        <ul>
+                            <li><strong>Fase 1:</strong> Abbina i pittogrammi alle sostanze corrette</li>
+                            <li><strong>Fase 2:</strong> Scegli i guanti giusti per ogni tipo di sostanza</li>
+                            <li>Clicca su due card per creare una coppia</li>
+                            <li>+10 punti per coppia corretta, -3 per errore</li>
+                            <li>Completa entrambe le fasi per il punteggio finale!</li>
+                        </ul>
+                    </div>
+
+                    <button class="btn" onclick="startPhase1()">🚀 Inizia Fase 1</button>
+                </div>
+            `;
+        }
+
+        function startPhase1() {
+            game.phase = 'pittogrammi';
+            game.selectedCards = [];
+            game.matchedPairs = [];
+            renderPittogrammiGame();
+        }
+
+        function renderPittogrammiGame() {
+            const content = document.getElementById('content');
+            
+            const pairs = Object.entries(pittogrammi).slice(0, 6);
+            const cards = [];
+            
+            pairs.forEach(([id, data]) => {
+                cards.push({ id: id, type: 'icon', content: data.icon, label: data.name, isImage: true });
+                cards.push({ id: id, type: 'desc', content: data.desc, label: data.desc, isImage: false });
+            });
+
+            const shuffled = cards.sort(() => Math.random() - 0.5);
+
+            let cardsHTML = '';
+            shuffled.forEach((card, index) => {
+                const isMatched = game.matchedPairs.includes(card.id);
+                const iconContent = card.isImage ? `<img src="${card.content}" alt="${card.label}">` : '📄';
+                cardsHTML += `
+                    <div class="card ${isMatched ? 'matched' : ''}" 
+                         data-id="${card.id}" 
+                         data-index="${index}"
+                         onclick="${isMatched ? '' : 'selectCard(this)'}">
+                        <div class="card-icon">${iconContent}</div>
+                        <div class="card-text">${card.label}</div>
+                    </div>
+                `;
+            });
+
+            content.innerHTML = `
+                <div class="phase-title">
+                    <h3>🏷️ Fase 1: Riconosci i Pittogrammi CLP</h3>
+                </div>
+
+                <div class="stats-bar">
+                    <div class="stat">
+                        <div class="stat-label">Abbinate</div>
+                        <div class="stat-value">${game.matchedPairs.length}/6</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Punteggio</div>
+                        <div class="stat-value">${game.score}</div>
+                    </div>
+                </div>
+
+                <div class="game-area">
+                    ${cardsHTML}
+                </div>
+            `;
+        }
+
+        function selectCard(element) {
+            if (game.selectedCards.length >= 2) return;
+            
+            element.classList.add('selected');
+            const cardId = element.dataset.id;
+            const cardIndex = element.dataset.index;
+            
+            game.selectedCards.push({ id: cardId, index: cardIndex, element: element });
+
+            if (game.selectedCards.length === 2) {
+                game.attempts++;
+                setTimeout(checkMatch, 600);
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = game.selectedCards;
+
+            if (card1.id === card2.id) {
+                game.matchedPairs.push(card1.id);
+                game.score += 10;
+                
+                card1.element.classList.remove('selected');
+                card2.element.classList.remove('selected');
+                card1.element.classList.add('matched');
+                card2.element.classList.add('matched');
+
+                showFeedback('success', '✅ Corretto!', 'Abbinamento giusto! +10 punti');
+
+                if (game.phase === 'pittogrammi' && game.matchedPairs.length === 6) {
+                    game.phase1Score = game.score;
+                    setTimeout(showTransition, 1000);
+                } else if (game.phase === 'guanti' && game.matchedPairs.length === 4) {
+                    game.phase2Score = game.score - game.phase1Score;
+                    setTimeout(endGame, 1000);
+                }
+            } else {
+                game.score = Math.max(0, game.score - 3);
+                
+                card1.element.classList.remove('selected');
+                card2.element.classList.remove('selected');
+                card1.element.classList.add('wrong');
+                card2.element.classList.add('wrong');
+
+                showFeedback('error', '❌ Errato', 'Riprova! -3 punti');
+
+                setTimeout(() => {
+                    card1.element.classList.remove('wrong');
+                    card2.element.classList.remove('wrong');
+                }, 500);
+            }
+
+            game.selectedCards = [];
+            
+            // Render the correct phase
+            if (game.phase === 'pittogrammi') {
+                renderPittogrammiGame();
+            } else if (game.phase === 'guanti') {
+                renderGuantiGame();
+            }
+        }
+
+        function showTransition() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="transition-screen">
+                    <h2>🎉 Fase 1 Completata!</h2>
+                    <p>Hai abbinato correttamente tutti i pittogrammi CLP.</p>
+                    <p><strong>Punteggio Fase 1: ${game.phase1Score} punti</strong></p>
+
+                    <div class="instructions">
+                        <h3>📋 Prossima Fase: Guanti Chimici</h3>
+                        <p>Ora dovrai abbinare il tipo di guanto corretto per ogni sostanza chimica.</p>
+                    </div>
+
+                    <button class="btn" onclick="startPhase2()">➡️ Continua alla Fase 2</button>
+                </div>
+            `;
+        }
+
+        function startPhase2() {
+            game.phase = 'guanti';
+            game.selectedCards = [];
+            game.matchedPairs = [];
+            renderGuantiGame();
+        }
+
+        function renderGuantiGame() {
+            const content = document.getElementById('content');
+            
+            const pairs = Object.entries(guanti);
+            const cards = [];
+            
+            pairs.forEach(([id, data]) => {
+                cards.push({ id: id, type: 'name', content: data.icon, label: data.name, isImage: true });
+                cards.push({ id: id, type: 'use', content: '🧪', label: data.use, isImage: false });
+            });
+
+            const shuffled = cards.sort(() => Math.random() - 0.5);
+
+            let cardsHTML = '';
+            shuffled.forEach((card, index) => {
+                const isMatched = game.matchedPairs.includes(card.id);
+                const iconContent = card.isImage ? `<img src="${card.content}" alt="${card.label}">` : card.content;
+                cardsHTML += `
+                    <div class="card ${isMatched ? 'matched' : ''}" 
+                         data-id="${card.id}" 
+                         data-index="${index}"
+                         onclick="${isMatched ? '' : 'selectCard(this)'}">
+                        <div class="card-icon">${iconContent}</div>
+                        <div class="card-text">${card.label}</div>
+                    </div>
+                `;
+            });
+
+            content.innerHTML = `
+                <div class="phase-title">
+                    <h3>🧤 Fase 2: Guanti Chimici Corretti</h3>
+                </div>
+
+                <div class="stats-bar">
+                    <div class="stat">
+                        <div class="stat-label">Abbinate</div>
+                        <div class="stat-value">${game.matchedPairs.length}/4</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Punteggio</div>
+                        <div class="stat-value">${game.score}</div>
+                    </div>
+                </div>
+
+                <div class="game-area">
+                    ${cardsHTML}
+                </div>
+            `;
+        }
+
+        function showFeedback(type, title, message) {
+            const feedback = document.createElement('div');
+            feedback.className = `feedback ${type}`;
+            feedback.innerHTML = `
+                <div style="font-weight: bold; font-size: 1.2em; margin-bottom: 10px;">${title}</div>
+                <div>${message}</div>
+            `;
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => feedback.remove(), 2000);
+        }
+
+        function endGame() {
+            game.phase2Score = game.score - game.phase1Score;
+            const content = document.getElementById('content');
+
+            let performance = '';
+            if (game.score >= 130) {
+                performance = '🏆 Eccellente! Esperto in sostanze pericolose!';
+            } else if (game.score >= 100) {
+                performance = '👍 Molto bene! Buona conoscenza CLP e DPI.';
+            } else if (game.score >= 70) {
+                performance = '✅ Sufficiente, ripassa UD5.';
+            } else {
+                performance = '📚 Rivedi la normativa CLP e i DPI chimici!';
+            }
+
+            content.innerHTML = `
+                <div class="results-screen">
+                    <h2>🎮 Gioco Completato!</h2>
+                    
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-label">Punteggio Totale</div>
+                            <div class="result-value">${game.score}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Fase 1 (Pittogrammi)</div>
+                            <div class="result-value">${game.phase1Score}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Fase 2 (Guanti)</div>
+                            <div class="result-value">${game.phase2Score}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Tentativi Totali</div>
+                            <div class="result-value">${game.attempts}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                        <h3 style="color: #667eea; margin-bottom: 10px; font-size: 1.2em;">Valutazione</h3>
+                        <p style="font-size: 1.1em; color: #495057;">${performance}</p>
+                    </div>
+                    
+                    <button class="btn" onclick="location.reload()">🔄 Rigioca</button>
+                    <button class="btn btn-secondary" onclick="window.close()">📚 Torna al Corso</button>
+                </div>
+            `;
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
